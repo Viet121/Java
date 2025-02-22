@@ -7,8 +7,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthenticationRequest {
-    String username;
-    String password;
+    private String userName;
+    private String password;
 }
