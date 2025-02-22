@@ -3,6 +3,7 @@ package com.javabackend.learn_spring_boot.controller;
 import com.javabackend.learn_spring_boot.dto.request.ApiResponse;
 import com.javabackend.learn_spring_boot.dto.request.UserCreatRequest;
 import com.javabackend.learn_spring_boot.dto.request.UserUpdateRequest;
+import com.javabackend.learn_spring_boot.dto.response.UserResponse;
 import com.javabackend.learn_spring_boot.model.User;
 import com.javabackend.learn_spring_boot.service.UserService;
 import jakarta.validation.Valid;
@@ -32,8 +33,8 @@ public class UserController {
     }
 
     @GetMapping("/userName/{userName}")
-    public ResponseEntity<Optional<User>> getSingleUserByUserName(@PathVariable String userName){
-        return new ResponseEntity<Optional<User>>(userService.getUserByUserName(userName), HttpStatus.OK);
+    public UserResponse getSingleUserByUserName(@PathVariable String userName){
+        return userService.getUserByUserName(userName);
     }
 
     @PostMapping

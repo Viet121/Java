@@ -1,47 +1,42 @@
 package com.javabackend.learn_spring_boot.dto.request;
 
 import jakarta.validation.constraints.Size;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 
+//Annotation Data bao gom cac annotation khac nhu setter, getter, requiredArgs...(ko cho phep tao class null), ...
+@Data
+
+@Builder
+/*
+Binh thuong khi chung ta tao 1 class moi, va set du lieu nao do cho field cua class thi
+    UserCreatRequest request = new UserCreatRequest();
+    request.setUserName("Quoc Viet"); ...
+Dung Lombok Builder
+    UserCreatRequest request = UserCreatRequest.builder()
+        .userName("Quoc Viet")
+        .f...
+        .build();
+*/
+
+// nguoc lai voi requiredArgs... va AllArgs..
+@NoArgsConstructor
+
+@AllArgsConstructor
+// thay vi private cho cac field o duoi thi dung
+@FieldDefaults(level = AccessLevel.PRIVATE) //mac dinh cho cac field khong dinh nghia la private
 public class UserCreatRequest {
-    private String userName;
+
+    // private String userName; (field dinh nghia luc ban dau la nhu nay)
+    // sau khi dung Lombok annotation @FieldDefaults
+    String userName;
 
     @Size(min = 8, message = "PASSWORD_INVALID")
-    private String password;
-    private String name;
-    private LocalDate dob;
+    String password;
+    String name;
+    LocalDate dob;
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
 }
