@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Document(collection = "users")
 @Data
@@ -22,5 +23,5 @@ public class User {
     String password;
     String name;
     LocalDate dob;
-
+    Set<String> roles;
 }

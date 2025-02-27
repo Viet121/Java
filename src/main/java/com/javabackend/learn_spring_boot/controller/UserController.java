@@ -23,13 +23,23 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return new ResponseEntity<List<User>>(userService.getUsers(), HttpStatus.OK);
+    public ApiResponse<List<User>> getAllUsers() {
+
+        return ApiResponse.<List<User>>builder()
+                .result(userService.getUsers())
+                .build();
     }
 
     @GetMapping("/userId/{userId}")
     public User getSingleUser(@PathVariable String userId){
         return userService.getUserByUserId(userId);
+    }
+
+    @GetMapping("/myInfo")
+    public ApiResponse<UserResponse> getMyInfo (){
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
     }
 
     @GetMapping("/userName/{userName}")
@@ -38,8 +48,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ApiResponse<User> createUser(@RequestBody @Valid UserCreatRequest userCreatRequest) {
-        ApiResponse<User> apiResponse = new ApiResponse<>();
+    public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreatRequest userCreatRequest) {
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.createUser(userCreatRequest));
         return apiResponse;
     }
