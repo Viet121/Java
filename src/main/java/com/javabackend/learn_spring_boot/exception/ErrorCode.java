@@ -1,28 +1,35 @@
 package com.javabackend.learn_spring_boot.exception;
 
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
 public enum ErrorCode {
-    USER_EXISTED(101, "User existed"),
-    INVALID_KEY(102, "Uncategorized error"),
-    USER_NOT_FOUND(103,"User not found"),
-    INCORRECT_PASS(104,"Incorrect password"),
-    PASSWORD_INVALID(105,"Password must be at least 8 character"),
-    UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error"),
+    //user da ton tai
+    USER_EXISTED(101, "User existed", HttpStatus.NOT_FOUND),
+    //tu khoa khong ton tai
+    INVALID_KEY(102, "Uncategorized error", HttpStatus.BAD_REQUEST),
+    //user khong ton tai
+    USER_NOT_FOUND(103,"User not found", HttpStatus.NOT_FOUND),
+    //pass khong dung hoac khong xac nhan duoc user
+    UNAUTHENTICATED(104,"Unauthenticated", HttpStatus.UNAUTHORIZED),
+    //khong co quyen thuc hien request (permission su cho phep)
+    UNAUTHORIZED(105,"You do not have permission", HttpStatus.FORBIDDEN),
+    //pass duoc tao khong hop le
+    PASSWORD_INVALID(106,"Password must be at least 8 character",HttpStatus.BAD_REQUEST),
+    //loi khong xac dinh
+    UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
 
     ;
 
-    ErrorCode(int code, String message) {
+    ErrorCode(int code, String message, HttpStatus httpStatus) {
         this.code = code;
         this.message = message;
+        this.httpStatus = httpStatus;
     }
 
     private int code;
     private String message;
+    private HttpStatus httpStatus;
 
-    public String getMessage() {
-        return message;
-    }
-
-    public int getCode() {
-        return code;
-    }
 }
