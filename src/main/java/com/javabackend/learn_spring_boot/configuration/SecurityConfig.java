@@ -68,7 +68,7 @@ public class SecurityConfig {
 
     // converter(bo chuyen doi)
     // Vi khi dung OAuth2 voi JWT, Spring Security mac dinh tim quyen trong scope.
-    // Neu tu xay dung JWT (khong dung OAuth2), ta co the dung role hoac custom bat ki claim nao ma ko can converter lai
+    // Neu tu xay dung JWT (khong dung OAuth2), ta co the dung role hoac customgi bat ki claim nao ma ko can converter lai
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter(){
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
