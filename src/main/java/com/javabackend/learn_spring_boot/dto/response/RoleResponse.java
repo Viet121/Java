@@ -3,18 +3,16 @@ package com.javabackend.learn_spring_boot.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
-    String userName;
+public class RoleResponse {
     String name;
-    LocalDate dob;
+    String description;
 
-    Set<RoleResponse> roles;
+    Set<PermissionResponse> permissions;
 }

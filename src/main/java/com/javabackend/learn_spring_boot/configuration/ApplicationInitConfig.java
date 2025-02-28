@@ -1,4 +1,4 @@
-package com.javabackend.learn_spring_boot.configuration;
+/*package com.javabackend.learn_spring_boot.configuration;
 
 import com.javabackend.learn_spring_boot.enums.Role;
 import com.javabackend.learn_spring_boot.model.User;
@@ -31,7 +31,7 @@ public class ApplicationInitConfig {
                 User user = User.builder()
                         .userName("admin")
                         .password(passwordEncoder.encode("admin"))
-                        .roles(roles)
+                        //.roles(roles)
                         .build();
 
                 userRepository.save(user);
@@ -39,4 +39,4 @@ public class ApplicationInitConfig {
             }
         };
     }
-}
+}*/

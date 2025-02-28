@@ -66,13 +66,13 @@ public class SecurityConfig {
                 .build();
     }
 
-    // converter(bo chuyen doi)
+    // converter(bo chuyen doi), tu dong gan them ROLE_ vao scope
     // Vi khi dung OAuth2 voi JWT, Spring Security mac dinh tim quyen trong scope.
     // Neu tu xay dung JWT (khong dung OAuth2), ta co the dung role hoac customgi bat ki claim nao ma ko can converter lai
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter(){
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix(""); //vi da them ROLE vao o ben Service cho Scope nen ko can nua
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);

@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
+import java.util.List;
 
 //Annotation Data bao gom cac annotation khac nhu setter, getter, requiredArgs...(ko cho phep tao class null), ...
 @Data
@@ -38,5 +39,5 @@ public class UserCreatRequest {
     String password;
     String name;
     LocalDate dob;
-
+    List<String> roles;
 }

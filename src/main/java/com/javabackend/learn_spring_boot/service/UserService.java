@@ -2,12 +2,14 @@ package com.javabackend.learn_spring_boot.service;
 
 import com.javabackend.learn_spring_boot.dto.request.UserCreatRequest;
 import com.javabackend.learn_spring_boot.dto.request.UserUpdateRequest;
+import com.javabackend.learn_spring_boot.dto.response.RoleResponse;
 import com.javabackend.learn_spring_boot.dto.response.UserResponse;
 import com.javabackend.learn_spring_boot.enums.Role;
 import com.javabackend.learn_spring_boot.exception.AppException;
 import com.javabackend.learn_spring_boot.exception.ErrorCode;
 import com.javabackend.learn_spring_boot.mapper.UserMapper;
 import com.javabackend.learn_spring_boot.model.User;
+import com.javabackend.learn_spring_boot.repository.RoleRepository;
 import com.javabackend.learn_spring_boot.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
     UserRepository userRepository;
+    RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
@@ -54,7 +57,9 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
     //1 user theo userName
+    @PreAuthorize("hasAuthority('ROLE_USER')")
     public UserResponse getUserByUserName(String userName) {
+
         return userMapper.toUserResponse(userRepository.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found")));
     }
@@ -74,9 +79,11 @@ public class UserService {
 //        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
 
-        HashSet<String> roles = new  HashSet<>();
-        roles.add(Role.USER.name());
-        user.setRoles(roles);
+        var roles = roleRepository.findAllById(userRequest.getRoles());
+        user.setRoles(new HashSet<>(roles));
+//        HashSet<String> roles = new  HashSet<>();
+//        roles.add(Role.USER.name());
+//        user.setRoles(roles);
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
@@ -84,12 +91,16 @@ public class UserService {
     // cap nhat user
     public User updateUser(String userId, UserUpdateRequest request) {
         // tim va tao User tu userId
-        User user = getUserByUserId(userId);
+        User user = getUserByUserId(userId); //ham tim user o ben tren
 
 //        user.setPassword(request.getPassword());
 //        user.setName(request.getName());
 //        user.setDob(request.getDob());
         userMapper.updateUser(user,request); //1 dong nay dung mapper thay cho 3 dong tren
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
 
         return userRepository.save(user);
     }

@@ -49,7 +49,7 @@ public class AuthenticationService {
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        var authenticated = passwordEncoder.matches(request.getPassword(),user.getPassword());
+        boolean authenticated = passwordEncoder.matches(request.getPassword(),user.getPassword());
 
         if (!authenticated)
             throw new AppException(ErrorCode.UNAUTHENTICATED);
@@ -68,7 +68,7 @@ public class AuthenticationService {
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUserName())
-                .issuer("devteria.com")
+                .issuer("learnjava.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
@@ -89,11 +89,18 @@ public class AuthenticationService {
         }
     }
 
-    // tao scope de dua vao token
+    // tao scope de cho vao token
     private String buildScope(User user){
         StringJoiner stringJoiner = new StringJoiner(" ");
+
         if (!CollectionUtils.isEmpty(user.getRoles()))
-            user.getRoles().forEach(stringJoiner::add);
+            user.getRoles().forEach(role ->{
+                stringJoiner.add("ROLE_" + role.getName());
+                if(!CollectionUtils.isEmpty(role.getPermissions()))
+                    role.getPermissions().forEach(permission -> {
+                        stringJoiner.add(permission.getName());
+                    });
+            });
 
         return stringJoiner.toString();
     }

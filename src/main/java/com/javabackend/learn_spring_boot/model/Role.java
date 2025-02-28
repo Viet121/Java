@@ -2,30 +2,24 @@ package com.javabackend.learn_spring_boot.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Document(collection = "users")
+@Document(collection = "roles")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
-public class User {
+public class Role {
     @Id
-    String id; //id tu tang cua mongodb
-    String userName;
-    String password;
     String name;
-    LocalDate dob;
+    String description; //mo ta
 
     @DBRef  // Tham chiếu đến Collection "roles"
-    Set<Role> roles;
+    Set<Permission> permissions;
 }
