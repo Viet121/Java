@@ -20,7 +20,7 @@ public enum ErrorCode {
     //pass duoc tao khong hop le
     PASSWORD_INVALID(106,"Password must be at least 8 character",HttpStatus.BAD_REQUEST),
     //khong du tuoi
-    INVALID_DOB(107,"Invalid date of birth", HttpStatus.BAD_REQUEST)
+    INVALID_DOB(107,"Your age must be at lest {min}", HttpStatus.BAD_REQUEST)
     ;
 
     ErrorCode(int code, String message, HttpStatus httpStatus) {
