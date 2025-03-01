@@ -1,5 +1,6 @@
 package com.javabackend.learn_spring_boot.dto.request;
 
+import com.javabackend.learn_spring_boot.validator.DobConstraint;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -34,10 +35,10 @@ public class UserCreatRequest {
     // private String userName; (field dinh nghia luc ban dau la nhu nay)
     // sau khi dung Lombok annotation @FieldDefaults
     String userName;
-
     @Size(min = 8, message = "PASSWORD_INVALID")
     String password;
     String name;
+    @DobConstraint(min = 18, message = "INVALID_DOB")
     LocalDate dob;
     List<String> roles;
 }
