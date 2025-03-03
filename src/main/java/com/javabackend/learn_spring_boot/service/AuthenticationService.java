@@ -2,11 +2,14 @@ package com.javabackend.learn_spring_boot.service;
 
 import com.javabackend.learn_spring_boot.dto.request.AuthenticationRequest;
 import com.javabackend.learn_spring_boot.dto.request.IntrospectRequest;
+import com.javabackend.learn_spring_boot.dto.request.LogoutRequest;
 import com.javabackend.learn_spring_boot.dto.response.AuthenticationResponse;
 import com.javabackend.learn_spring_boot.dto.response.IntrospectResponse;
 import com.javabackend.learn_spring_boot.exception.AppException;
 import com.javabackend.learn_spring_boot.exception.ErrorCode;
+import com.javabackend.learn_spring_boot.model.InvalidatedToken;
 import com.javabackend.learn_spring_boot.model.User;
+import com.javabackend.learn_spring_boot.repository.InvalidatedTokenRepository;
 import com.javabackend.learn_spring_boot.repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -29,6 +32,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -37,6 +41,7 @@ import java.util.StringJoiner;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationService {
     UserRepository userRepository;
+    InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
     @Value("${env.SIGNER_KEY}")
@@ -73,6 +78,7 @@ public class AuthenticationService {
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 ))
+                .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(user))
                 .build();
 
@@ -105,9 +111,8 @@ public class AuthenticationService {
         return stringJoiner.toString();
     }
 
-    // kiem tra token
-    public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
-        var token = request.getToken();
+    // ham nay luc dau nam o trong introspect
+    private SignedJWT verifyToken(String token) throws JOSEException, ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -116,8 +121,51 @@ public class AuthenticationService {
 
         var verified = signedJWT.verify(verifier);
 
+        if (!(verified && expiryTime.after(new Date())))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        return signedJWT;
+    }
+
+    // kiem tra token
+    public IntrospectResponse introspect(IntrospectRequest request)  throws JOSEException, ParseException {
+        var token = request.getToken();
+        /*
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        var verified = signedJWT.verify(verifier);
         return IntrospectResponse.builder()
                 .valid(verified && expiryTime.after(new Date()))
+                .build();*/
+        boolean isValid = true;
+
+        try { // kiem tra code co the gay ra loi
+            verifyToken(token); // kiem tra token con han khong, hoac co bi logout chua
+        } catch (AppException e) { // xu ly loi do
+            isValid = false;
+        }
+
+        return IntrospectResponse.builder()
+                .valid(isValid)
                 .build();
+    }
+
+    //log out token
+    public void logout(LogoutRequest request) throws ParseException, JOSEException{
+        var signToken = verifyToken(request.getToken());
+
+        String jit = signToken.getJWTClaimsSet().getJWTID();
+        Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
     }
 }

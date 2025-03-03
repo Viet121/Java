@@ -1,5 +1,6 @@
 package com.javabackend.learn_spring_boot.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +26,11 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {"/api/users",
-            "/api/auth/log-in", "/api/auth/introspect"
+            "/api/auth/log-in", "/api/auth/introspect", "/api/auth/logout"
     };
+
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
 
     @Value("${env.SIGNER_KEY}")
     protected String SIGNER_KEY;
@@ -46,7 +50,7 @@ public class SecurityConfig {
         // cai dat xac thuc token cho cac request
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer -> jwtConfigurer
-                        .decoder(jwtDecoder())
+                        .decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
@@ -57,14 +61,7 @@ public class SecurityConfig {
         return httpSecurity.build();
     }
 
-    @Bean
-    JwtDecoder jwtDecoder(){
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SIGNER_KEY.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
+
 
     // converter(bo chuyen doi), tu dong gan them ROLE_ vao scope
     // Vi khi dung OAuth2 voi JWT, Spring Security mac dinh tim quyen trong scope.

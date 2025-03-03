@@ -1,9 +1,6 @@
 package com.javabackend.learn_spring_boot.controller;
 
-import com.javabackend.learn_spring_boot.dto.request.ApiResponse;
-import com.javabackend.learn_spring_boot.dto.request.AuthenticationRequest;
-import com.javabackend.learn_spring_boot.dto.request.IntrospectRequest;
-import com.javabackend.learn_spring_boot.dto.request.UserCreatRequest;
+import com.javabackend.learn_spring_boot.dto.request.*;
 import com.javabackend.learn_spring_boot.dto.response.AuthenticationResponse;
 import com.javabackend.learn_spring_boot.dto.response.IntrospectResponse;
 import com.javabackend.learn_spring_boot.model.User;
@@ -40,6 +37,12 @@ public class AuthenticationController {
         var result = authenticationService.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
                 .result(result)
+                .build();
+    }
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
                 .build();
     }
 }
