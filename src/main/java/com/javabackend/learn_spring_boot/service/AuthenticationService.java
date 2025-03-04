@@ -3,6 +3,7 @@ package com.javabackend.learn_spring_boot.service;
 import com.javabackend.learn_spring_boot.dto.request.AuthenticationRequest;
 import com.javabackend.learn_spring_boot.dto.request.IntrospectRequest;
 import com.javabackend.learn_spring_boot.dto.request.LogoutRequest;
+import com.javabackend.learn_spring_boot.dto.request.RefeshRequest;
 import com.javabackend.learn_spring_boot.dto.response.AuthenticationResponse;
 import com.javabackend.learn_spring_boot.dto.response.IntrospectResponse;
 import com.javabackend.learn_spring_boot.exception.AppException;
@@ -167,5 +168,28 @@ public class AuthenticationService {
                 .build();
 
         invalidatedTokenRepository.save(invalidatedToken);
+
+    }
+
+    //refresh token
+    public AuthenticationResponse refreshToken(RefeshRequest request) throws ParseException, JOSEException {
+        var signJWT = verifyToken(request.getToken());
+        var jit = signJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jit)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+        var userName = signJWT.getJWTClaimsSet().getSubject();
+        var user = userRepository.findByUserName(userName).orElseThrow(
+                () -> new AppException(ErrorCode.UNAUTHENTICATED)
+        );
+        var token = generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(token)
+                .authentication(true)
+                .build();
     }
 }
